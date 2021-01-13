@@ -3,7 +3,9 @@ from src.Node import Node
 
 
 class DiGraph(GraphInterface):
-
+    """
+    This class represents a directed (positive) weighted graph data structure G(V, E)
+    """
     def __init__(self):
         """
         Default constructor:
@@ -191,6 +193,14 @@ class DiGraph(GraphInterface):
         self_copy_dict = self.deep_copy().__dict__
         del self_copy_dict["R"]
         return self_copy_dict
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            a = self.V == other.V
+            b = self.E == other.E
+            return a and b
+        else:
+            return False
 
     def __str__(self):
         """

@@ -12,6 +12,17 @@ import matplotlib.pyplot as plt
 
 class GraphAlgo(GraphAlgoInterface):
 
+    """
+    This class represents a set of algorithms applicable on a directed weighted graph including:
+    1) Shortest Path - Dijkstra
+    2) Strongly connected Components (SCC) -
+        1) Tarjan's recursive algorithm
+        2) Simple iterative algorithm using BFS (searches for intersections).
+    3) Strongly connected component - using BFS
+    4) Save to Json
+    5) Load from Json
+    """
+
     def __init__(self, graph=DiGraph()):
         self.g = graph
 
@@ -42,24 +53,6 @@ class GraphAlgo(GraphAlgoInterface):
         except IOError as e:
             print(e)
             return False
-        # graph = DiGraph()  # Create new empty graph object.
-        # try:
-        #     with open(file_name, "r") as file:  # open json file with read-only option.
-        #         graph_dict = json.load(file)  # Load dictionary from file.
-        #         v_dict = graph_dict["V"]  # A dictionary representing all nodes (vertices).
-        #         e_dict = graph_dict["E"]  # A dictionary representing all edges.
-        #         for v in v_dict.values():
-        #             graph.add_node(v["key"], None if v["pos"] is None else tuple(v["pos"]))
-        #         for k1, v1 in e_dict.items():
-        #             inner_edges_dict = v1
-        #             for k2, v2 in inner_edges_dict.items():
-        #                 graph.add_edge(int(k1), int(k2), float(v2))
-        #         graph.MC = graph_dict["MC"]
-        #         self.g = graph
-        #         return True
-        # except IOError as e:
-        #     print(e)
-        #     return False
 
     def save_to_json(self, file_name: str) -> bool:
         """
@@ -89,13 +82,6 @@ class GraphAlgo(GraphAlgoInterface):
         except IOError as e:
             print(e)
             return False
-        # try:
-        #     with open(file_name, "w") as file:
-        #         json.dump(self.g, default=lambda o: o.as_dict(), indent=4, fp=file)
-        #         return True
-        # except IOError as e:
-        #     print(e)
-        #     return False
 
     def shortest_path(self, id1: int, id2: int) -> (float, list):
         """
@@ -122,7 +108,8 @@ class GraphAlgo(GraphAlgoInterface):
         More info:
         https://en.wikipedia.org/wiki/Dijkstra's_algorithm
         """
-        if (id1 not in self.g.get_all_v()) or (id2 not in self.g.get_all_v()):  # One of nodes or both doesn't exist.
+        if (self.g is None) or (id1 not in self.g.get_all_v()) or \
+                (id2 not in self.g.get_all_v()):  # One of nodes or both doesn't exist.
             return tuple((float('inf'), []))
         if id1 == id2:  # The distance from node to itself is 0.
             return tuple((0, [id1]))
@@ -174,11 +161,7 @@ class GraphAlgo(GraphAlgoInterface):
         """
         if (self.g is None) or (self.g.v_size() == 0) or (id1 not in self.g.get_all_v()):
             return []
-        component = self.scc_tarjan(id1)
-        if component is None:
-            return []
-        else:
-            return component
+        return self.scc(id1)
 
     def connected_components(self) -> List[list]:
         """
@@ -190,7 +173,69 @@ class GraphAlgo(GraphAlgoInterface):
         """
         if (self.g is None) or (self.g.v_size() == 0):
             return []
-        return self.scc_tarjan()
+        return self.scc()
+
+    def scc(self, node_id=None):
+        """
+        Strongly connected components (SCC)
+        This functions used both for SCCs and for a single SCC (by id)
+        :param node_id: optional - If id is not node, then search for a specific component.
+        :return: the Strongly Connected Component(SCC) that node id1 is a part of. or all SCCs.
+        """
+        components = []
+        temp_dict = {}
+        if node_id is None:
+            for n in self.g.get_all_v().values():
+                if n.key not in temp_dict:
+                    list_out = self.bfs(n, True)
+                    list_in = self.bfs(n, False)
+                    intersect = list(set(list_out).intersection(list_in))
+                    components.append(intersect)
+                    temp = dict.fromkeys(intersect, 1)
+                    temp_dict.update(temp)
+            return components
+        else:
+            n = self.g.get_all_v()[node_id]
+            list_out = self.bfs(n, True)
+            list_in = self.bfs(n, False)
+            intersect = list(set(list_out).intersection(list_in))
+            return intersect
+
+    def bfs(self, node: Node, out: bool) -> list:
+        """
+        BFS algorithm
+        Helper algorithm for the SCC algorithm.
+        :param node: - a node to start BFS searching from.
+        :param out: - determines how to search: out - search all out edges of node, in - search al in edges of node.
+        :return: - a list representing all visited nodes.
+        """
+        for n in self.g.get_all_v().values():  # Set all nodes as unvisited.
+            n.temp_color = "WHITE"
+
+        visited = []
+        queue = []
+
+        node.temp_color = "GRAY"
+        visited.append(node.key)
+        queue.append(node.key)
+
+        if out:
+            while queue:
+                v = queue.pop(0)
+                for neighbor in self.g.all_out_edges_of_node(v).keys():
+                    if self.g.get_all_v()[neighbor].temp_color == "WHITE":
+                        self.g.get_all_v()[neighbor].temp_color = "GRAY"
+                        visited.append(neighbor)
+                        queue.append(neighbor)
+        else:
+            while queue:
+                v = queue.pop(0)
+                for neighbor in self.g.all_in_edges_of_node(v).keys():
+                    if self.g.get_all_v()[neighbor].temp_color == "WHITE":
+                        self.g.get_all_v()[neighbor].temp_color = "GRAY"
+                        visited.append(neighbor)
+                        queue.append(neighbor)
+        return visited
 
     def scc_tarjan(self, node_id=None):
         """
@@ -220,14 +265,6 @@ class GraphAlgo(GraphAlgoInterface):
                 if node.temp_color == "WHITE":  # If node is unvisited.
                     self.dfs(node, components, time, low_link, ids, on_stack, stack, translator, node_id)
             return components
-        # for node in self.g.get_all_v().values():
-        #     if node.temp_color == "WHITE":  # If node is unvisited.
-        #         component = self.dfs(node, components, time, low_link, ids, on_stack, stack, translator, node_id)
-        #         if component is not None:
-        #             return component
-        # if node_id is not None:
-        #     return None
-        # return components
 
     def dfs(self, node: Node, components, time, low_link, ids, on_stack, stack, translator, node_id=None):
         """
@@ -279,38 +316,42 @@ class GraphAlgo(GraphAlgoInterface):
         Otherwise, they will be placed in a random but elegant manner.
         @return: None
         """
-        plt.figure(figsize=(10, 8))
+        plt.figure(figsize=(11, 8))
         plt.xlabel("X axis")
         plt.ylabel("Y axis")
-        plt.title("Directed Graph: " + str(self.g.v_size()) + " Nodes, " + str(self.g.e_size()) + " Edges")
-        positions = {}
-        for node in self.g.get_all_v().values():  # Draw nodes
-            if node.pos is not None:
-                x_pos = node.pos[0]
-                y_pos = node.pos[1]
-                positions[node.key] = (x_pos, y_pos)
-                plt.scatter(x=x_pos, y=y_pos, s=80, zorder=2, lw=3, c='#0000ff')
-            else:
-                a1 = 35
-                a2 = 32
-                rand_x = (np.random.rand()+a1)
-                rand_y = (np.random.rand()+a2)
-                positions[node.key] = (rand_x, rand_y)
-                plt.scatter(x=rand_x, y=rand_y, s=80, zorder=2, lw=3, c='#0000ff')
-        for src in self.g.E.keys():
-            for dest, w in self.g.E[src].items():
-                plt.plot([positions[src][0], positions[dest][0]],
-                         [positions[src][1], positions[dest][1]],
-                         'C3', zorder=1, lw=3, c='#000000')
-        plt.show()
-
-        # x_values = [35.18753053591606, 35.18958953510896, 35.19341035835351, 35.197528356739305]
-        # y_values = [32.10378225882353, 32.10785303529412, 32.10610841680672, 32.1053088]
-        # plt.xlabel("X axis")
-        # plt.ylabel("Y axis")
-        # plt.title("Directed Graph: " + str(self.g.v_size()) + " Nodes, " + str(self.g.e_size()) + " Edges")
-        # # plt.plot([1, 2], [4, 5], 'C3', zorder=1, lw=3, c='#000000')
-        # plt.scatter(x_values, y_values, s=100, zorder=2, c='#0000ff')
-        # # plt.text(2, 5, 10, fontsize=15)
-        # # plt.annotate(10, (1, 4))
-        # plt.show()
+        if (self.g is None) or (self.g.v_size() == 0):  # If it's an empty graph.
+            plt.title("Directed Graph: " + str(0) + " Nodes, " + str(0) + " Edges")
+            plt.text(0.35, 0.5, "Empty Graph", fontsize=24, zorder=3, color='#DD2BDA', weight='bold')
+            plt.show()
+        else:  # If graph is not empty
+            plt.title("Directed Graph: " + str(self.g.v_size()) + " Nodes, " + str(self.g.e_size()) + " Edges")
+            positions = {}  # Create container for storing nodes positions.
+            for node in self.g.get_all_v().values():  # Draw nodes
+                if node.pos is not None:
+                    x_pos = node.pos[0]
+                    y_pos = node.pos[1]
+                    positions[node.key] = (x_pos, y_pos)
+                    plt.scatter(x=x_pos, y=y_pos, s=30, zorder=2, lw=3, c='#0000ff')
+                    plt.text(x_pos, y_pos+0.0002, node.key, fontsize=12, zorder=3, color='#DD2BDA', weight='bold')
+                else:
+                    a1 = 35.0
+                    a2 = 32.0
+                    rand_x = (np.random.ranf()+a1)
+                    rand_y = (np.random.ranf()+a2)
+                    positions[node.key] = (rand_x, rand_y)
+                    plt.scatter(x=rand_x, y=rand_y, s=30, zorder=2, lw=3, c='#0000ff')
+                    plt.text(rand_x, rand_y+0.01, node.key, fontsize=12, zorder=3, color='#DD2BDA', weight='bold')
+            for src in self.g.E.keys():
+                for dest, w in self.g.E[src].items():
+                    # plt.plot([positions[src][0], positions[dest][0]],
+                    #          [positions[src][1], positions[dest][1]],
+                    #          'C3', zorder=1, lw=3, c='#000000')
+                    x1 = positions[src][0]
+                    y1 = positions[src][1]
+                    x2 = positions[dest][0]
+                    y2 = positions[dest][1]
+                    dx = x2 - x1
+                    dy = y2 - y1
+                    plt.arrow(x1, y1, dx, dy, head_width=0.0002, head_length=0.0003,
+                              fc='lightblue', ec='black', length_includes_head=True, width=0.00001)
+            plt.show()

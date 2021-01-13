@@ -17,7 +17,7 @@ class Node:
         return self.temp_weight < other.temp_weight
 
     def __eq__(self, other):
-        math.isclose(self.temp_weight, other.temp_weight)
+        return self.key == other.key
 
     def __gt__(self, other):
         return self.temp_weight > other.temp_weight
