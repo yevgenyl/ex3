@@ -21,6 +21,7 @@ class GraphAlgo(GraphAlgoInterface):
     3) Strongly connected component - using BFS
     4) Save to Json
     5) Load from Json
+    6) Plot the graph
     """
 
     def __init__(self, graph=DiGraph()):

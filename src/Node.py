@@ -2,7 +2,9 @@ import math
 
 
 class Node:
-
+    """
+    This class represents a node (single vertex) in a directed weighted graph.
+    """
     def __init__(self, node_id: int, pos: tuple):
         self.key = node_id
         self.pos = pos
