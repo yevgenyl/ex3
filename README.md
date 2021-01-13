@@ -20,7 +20,7 @@ to the well known python's open source library **NetworkX**. for more inforamtio
 
 - Below is an illustration of a directed Weighted Graph **G(V,E)** with 40 vertices and 102 directed edges:
 
-![Image of undirected weighted graph](https://github.com/yevgenyl/ex1/blob/master/res/graph_image.png?raw=true)
+![Image of directed weighted graph](https://github.com/yevgenyl/ex3/blob/master/res/directed_graph_example.png?raw=true)
 
 ### Class and Interface Summary
 
