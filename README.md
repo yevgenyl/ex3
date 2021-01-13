@@ -41,7 +41,7 @@ to the well known python's open source library **NetworkX**. for more inforamtio
 - This class represents a directed (positive) Weighted Graph Theory algorithms including:
 
   - shortest_path
-  - Strongly Connected Components (SCC)
+  - Strongly Connected Components (SCC).
   - Strongly Connected Component which includes a specific vertex.
   - Save to Json
   - Load from Json
@@ -50,10 +50,10 @@ to the well known python's open source library **NetworkX**. for more inforamtio
 ### Algorithms
   
   - **SCC** - The code conatains two implementations:
-    1) Tarjan's SCC algorithm - the recursive version usind DFS algorithm.
-    2) Simple iterative algorithm which searches for intersections.
-  - **BFS - Breadth-first search:** This algorithm is used by the SCC algorithm.
-  - **Dijkstra:** This algorithm is used by `shortest_path` method to find the shortest path between two vertices.
+    1) Tarjan's SCC algorithm - the recursive version usind DFS algorithm. **O(|V|+|E|)**.
+    2) Simple iterative algorithm which searches for intersections. 
+  - **BFS - Breadth-first search:** This algorithm is used by the SCC algorithm. **O(|V|+|E|)**.
+  - **Dijkstra:** This algorithm is used by `shortest_path` method to find the shortest path between two vertices. **O ( V + E l o g V )**
 
 ## Unit Tests
 - This project was tested using python unit tests.
