@@ -35,7 +35,7 @@ to the well known python's open source library **NetworkX**. for more inforamtio
 
 - Most of the basic operations (add node, connect nodes.. etc) are running in a constant time O(1).
 
-## GraphAlgo
+## GraphAlgo Class
 
 ### Class Overview
 - This class represents a directed (positive) Weighted Graph Theory algorithms including:
@@ -45,6 +45,7 @@ to the well known python's open source library **NetworkX**. for more inforamtio
   - Strongly Connected Component which includes a specific vertex.
   - Save to Json
   - Load from Json
+  - Plot the graph
 
 ### Algorithms
   
