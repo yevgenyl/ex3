@@ -14,7 +14,7 @@ to the well known python's open source library **NetworkX**. for more inforamtio
 
 - Inside the src folder you can find an implementation of the Graph Theory data structure and algorithms.
 
-- For more inforamtion, including the comparison results with NetworkX please read the **Wiki page** of this project.
+- For more inforamtion, including the comparison results with NetworkX please read the **[Wiki Page](https://github.com/yevgenyl/ex3/wiki)** of this project.
 
 - **Project contributors**: Evgueni Lachtchenov
 
