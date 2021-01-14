@@ -121,7 +121,7 @@ class MyTestCase(unittest.TestCase):
         graph.remove_edge(1, 5)  # Should increase MC
         self.assertEqual(15, graph.get_mc())
         graph.remove_node(1)  # Should increase MC by 4
-        self.assertEqual(19, graph.get_mc())
+        self.assertEqual(16, graph.get_mc())
 
 
 if __name__ == '__main__':

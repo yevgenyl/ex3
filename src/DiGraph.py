@@ -153,8 +153,10 @@ class DiGraph(GraphInterface):
             return False
         for i in list(self.all_out_edges_of_node(node_id)):  # Remove all out edges
             self.remove_edge(node_id, i)
+            self.MC -= 1
         for i in list(self.all_in_edges_of_node(node_id)):  # Remove all in edges
             self.remove_edge(i, node_id)
+            self.MC -= 1
         self.V.pop(node_id)  # Finally remove the node itself
         if node_id in self.E:
             self.E.pop(node_id)  # Remove node from edges list
